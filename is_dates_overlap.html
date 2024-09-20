@@ -59,7 +59,7 @@
 							emptyFields();
 						} else {
 							for (let i = startIndex; i < user.length; i++) {
-								if (dateStart > user[i].dateEnd || dateEnd < users[userName][i].dateStart) {
+								if (dateStart > user[i].dateEnd || dateEnd < user[i].dateStart) {
 									console.log("Good, dates don't overlap");
 								} else {
 									console.log("Error. Dates overlap.");
