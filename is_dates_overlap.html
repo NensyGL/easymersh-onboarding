@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-		<title>Document</title>
+		<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+		<title>Is dates overlap</title>
 	</head>
 	<body>
 		<div>
@@ -17,8 +17,7 @@
 
 		<script>
 			const users = {
-				a: [{ dateStart: "2024-09-01", dateEnd: "2024-09-10" }],
-				b: [{ dateStart: "2024-08-01", dateEnd: "2024-08-15" }],
+				a: [{dateStart: 1725408000000, dateEnd: 1725494400000}],
 			};
 
 			const displayDateRange = function (userName, dateStart, dateEnd) {
@@ -34,10 +33,11 @@
 			};
 
 			$("#btn").on("click", event => {
-				console.log("btn clicked");
-				let dateStart = $("input[name=date_start]").val();
-				let dateEnd = $("input[name=date_end]").val();
+				console.log("btn clicked, users are", users);
+				let dateStart = Date.parse($("input[name=date_start]").val());
+				let dateEnd = Date.parse($("input[name=date_end]").val());
 				const userName = $("input[name=user_name]").val();
+				console.log('userName', userName, 'dateStart', dateStart, 'dateEnd', dateEnd);
 				if (dateStart && dateEnd && userName) {
 					if (dateEnd < dateStart) {
 						console.log("dateStart more than dateEnd, dates replaces");
@@ -46,37 +46,62 @@
 						dateEnd = replacer;
 					}
 					const user = users[userName];
-					if (user) {
-						console.log("user exist", user);
+					if (users[userName]) {
 						let isOverlap = false;
-						for (let i = 0; i < user.length; i++) {
-							if (dateStart >= user[i].dateStart && dateStart <= user[i].dateEnd) {
-								isOverlap = true;
-								break;
-							}
-							if (dateEnd >= user[i].dateStart && dateEnd <= user[i].dateEnd) {
-								isOverlap = true;
-								break;
-							}
-							if (user[i].dateStart >= dateStart && user[i].dateStart <= dateEnd) {
-								isOverlap = true;
-								break;
-							}
-							if (user[i].dateEnd >= dateStart && user[i].dateEnd <= dateEnd) {
-								isOverlap = true;
-								break;
-							}
-						}
-						if (isOverlap) {
-							console.log("Dates overlap");
+						const startIndex = user.findIndex(d => {
+							d.dateEnd < dateStart;
+						});
+						if (startIndex === -1) {
+							users[userName].pop({ dateStart, dateEnd });
 						} else {
-							user.push({ dateStart, dateEnd });
-							displayDateRange(userName, dateStart, dateEnd);
-							emptyFields();
+							for (let i = startIndex; i < users[userName].length; i++) {
+								if (dateStart > users[userName][i].dateEnd || dateEnd < users[userName][i].dateStart) {
+									console.log("Good, dates don't overlap");
+								} else {
+									console.log("Error. Dates overlap.");
+									isOverlap = true;
+									break;
+								}
+							}
+							if (!isOverlap) {
+								const spliceIndex = users[userName].findIndex(d => {
+									d.dateEnd < dateStart;
+								});
+								users[userName].splice(spliceIndex + 1, { dateStart, dateEnd });
+								displayDateRange(userName, dateStart, dateEnd);
+								emptyFields();
+							}
 						}
+
+						// const start = dateStart > user[i].dateStart ? dateStart : user[i].dateStart;
+						// const end = dateEnd < user[i].dateEnd ? dateEnd : user[i].dateEnd;
+						// const isOverlap = start.valueOf() < end.valueOf();
+						// if (isOverlap) break;
+
+						// if (dateStart >= user[i].dateStart && dateStart <= user[i].dateEnd) {
+						// 	isOverlap = true;
+						// 	break;
+						// }
+						// if (dateEnd >= user[i].dateStart && dateEnd <= user[i].dateEnd) {
+						// 	isOverlap = true;
+						// 	break;
+						// }
+						// if (user[i].dateStart >= dateStart && user[i].dateStart <= dateEnd) {
+						// 	isOverlap = true;
+						// 	break;
+						// }
+						// if (user[i].dateEnd >= dateStart && user[i].dateEnd <= dateEnd) {
+						// 	isOverlap = true;
+						// 	break;
+						// }
+						//}
 					} else {
+						console.log('creating new user');
 						users[userName] = [];
-						users[userName].push({ dateStart, dateEnd });
+						const user = users[userName];
+						user.push({ dateStart, dateEnd });
+						// users[userName] = [];
+						// users[userName].push({ dateStart, dateEnd });
 						displayDateRange(userName, dateStart, dateEnd);
 						emptyFields();
 					}
