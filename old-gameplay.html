@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700&amp;subset=cyrillic"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=cyrillic"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&amp;subset=cyrillic"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Playfair+Display:400,400i|Tinos:400,400i&amp;subset=cyrillic"
+      rel="stylesheet"
+    />
+    <!--    <script type="text/javascript" src="/shared/3rdparty/jquery/jquery.js" language="javascript1.1"></script>-->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <!--    <script src="index.js"></script>-->
+    <script src="./utils.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        height: 100%;
+      }
+
+      body {
+        background-color: #000000;
+        color: #ffffff;
+      }
+
+      h1 {
+        font-family: "Playfair Display";
+        font-size: 30px;
+        padding: 10px 0px;
+        margin: 0px;
+      }
+
+      .field-box {
+        border: 2px solid #d0d0d0;
+        float: left;
+        position: relative;
+      }
+
+      .field {
+        position: relative;
+        width: 1080px;
+        height: 576px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .gameMsg {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 15;
+        background-color: rgb(0 0 0 / 40%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .gameMsg p {
+        font-size: 100px;
+        font-family: "Playfair Display", "serif";
+        font-weight: bold;
+      }
+
+      .gameMsg .winner {
+        color: #5bcb3e;
+      }
+
+      .gameMsg .looser {
+        color: #f5292c;
+      }
+
+      .gameMsg .info {
+        color: #e7623e;
+      }
+
+      .field .tile {
+        width: 24px;
+        height: 24px;
+        background-size: 100%;
+        background-image: url(images/tile-.png);
+        z-index: 5;
+      }
+
+      .field .tileW {
+        background-image: url(images/tile-W.png);
+      }
+
+      .field .tileE {
+        background-image: url(images/tile-E.png);
+        z-index: 10;
+        position: relative;
+      }
+
+      .field .tileP {
+        background-image: url(images/tile-P.png);
+        z-index: 10;
+        position: relative;
+      }
+
+      .field .tileHP {
+        background-image: url(images/tile-HP.png);
+        z-index: 9;
+      }
+
+      .field .tileSW {
+        background-image: url(images/tile-SW.png);
+        z-index: 9;
+      }
+
+      .field .tileFB {
+        background-image: url(images/fireball.png);
+        z-index: 9;
+      }
+
+      .field .tilePortal {
+        background-image: url(images/portal.png);
+        z-index: 9;
+      }
+
+      .field .tile .health {
+        background-color: #ff0000;
+        z-index: 11;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        height: 3px;
+      }
+
+      .field .tileP .health {
+        background-color: #00ff00;
+        z-index: 11;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        height: 3px;
+      }
+
+      .inventory-box {
+        border: 2px solid #d0d0d0;
+        float: left;
+      }
+
+      .inventory {
+        position: relative;
+        width: 800px;
+        height: 32px;
+      }
+
+      .cl {
+        clear: both;
+        display: block;
+      }
+
+      #game-result {
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      #btn-container button {
+        margin: 10px auto;
+        width: 200px;
+        letter-spacing: 2px;
+        border-radius: 8px;
+        font-family: "Playfair Display", cursive;
+        color: #ffc000;
+        font-size: 18px;
+        font-weight: 400;
+        text-shadow: 0 1px 3px #000;
+        text-align: center;
+        padding: 10px 0;
+        background: radial-gradient(circle, #8b0000, #8b0000);
+        border: 4px ridge #ffb000;
+        box-shadow: inset 0px 0px 5px 3px rgba(1, 1, 1, 0.3);
+      }
+
+      #btn-container button:hover {
+        background: radial-gradient(circle, #e52b2b, #8b0000);
+        box-shadow: 0 0 5px 5px rgba(255, 255, 255, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Игровое поле</h1>
+    <div class="field-box">
+      <div class="field"></div>
+    </div>
+    <div class="cl"></div>
+    <div id="btn-container">
+      <button id="start-btn" class="">Start</button>
+      <button id="restart-btn" class="hidden">Restart</button>
+      <button id="pause-btn" class="hidden">Pause</button>
+    </div>
+    <!--<h1>Инвентарь</h1>
+<div class="inventory-box"><div class="inventory"></div></div>-->
+
+    <script>
+      // GLOBAL CONSTANTS
+      const GAME_FIELD_Y = 45;
+      const GAME_FIELD_X = 24;
+      const MIN_ROOM_NUMBER = 5;
+      const MAX_ROOM_NUMBER = 10;
+      const MIN_ROOM_LEN = 3;
+      const MAX_ROOM_LEN = 8;
+      const MIN_HALL_NUMBER = 3;
+      const MAX_HALL_NUMBER = 5;
+      const SWORD_NUM = 2;
+      const HEALTH_NUM = 10;
+      const FUll_HERO_HEALTH = 5;
+      const ENEMY_NUM = 10;
+      const ENEMY_TIME_STEP = 2000;
+
+      // UTILITIES FUNCTIONS
+
+      class Game {
+        constructor() {}
+
+        map = [];
+        tilesCoords = [];
+        tilesLen = 0;
+        hero;
+        enemies;
+        healthBoxes;
+        swordBoxes;
+        portals;
+        fireball = {};
+        isPlaying = false;
+        isFireballDestroyed = true;
+        gameTimer = 0;
+        lastMoveTimer = 0;
+        lastDirection = "";
+
+        // FIELD INIT START
+        playersInit() {
+          this.hero = {
+            posX: 0,
+            posY: 0,
+            health: FUll_HERO_HEALTH,
+            fightPower: 1,
+          };
+          this.enemies = new Array(ENEMY_NUM).fill({});
+          for (let i = 0; i < ENEMY_NUM; i++) {
+            this.enemies[i] = {
+              posX: 0,
+              posY: 0,
+              health: FUll_HERO_HEALTH,
+              fightPower: 1,
+            };
+          }
+          this.healthBoxes = new Array(HEALTH_NUM).fill({});
+          for (let i = 0; i < HEALTH_NUM; i++) {
+            this.healthBoxes[i] = {
+              posX: 0,
+              posY: 0,
+            };
+          }
+          this.swordBoxes = new Array(SWORD_NUM).fill({});
+          for (let i = 0; i < SWORD_NUM; i++) {
+            this.swordBoxes[i] = {
+              posX: 0,
+              posY: 0,
+            };
+          }
+          this.portals = new Array(4).fill({});
+          for (let i = 0; i < 4; i++) {
+            this.portals[i] = {
+              posX: 0,
+              posY: 0,
+              // type: i % 2 ? 'in' : 'out',
+              linkedCoord: {
+                posX: 0,
+                posY: 0,
+              },
+            };
+          }
+        }
+
+        createWallMap() {
+          this.map = Array.from({ length: GAME_FIELD_X }, (_) =>
+            new Array(GAME_FIELD_Y).fill("tileW")
+          );
+        }
+
+        createHalls() {
+          const hallNumX = getRandomNumFromRange(
+            MIN_HALL_NUMBER,
+            MAX_HALL_NUMBER
+          );
+          const hallNumY = getRandomNumFromRange(
+            MIN_HALL_NUMBER,
+            MAX_HALL_NUMBER
+          );
+          let i = 0;
+          while (i < hallNumX) {
+            const randomX = getRandomNumFromRange(1, GAME_FIELD_X - 2);
+            if (
+              !this.isTileEmpty({ x: randomX - 1, y: 0 }) &&
+              !this.isTileEmpty({ x: randomX + 1, y: 0 })
+            ) {
+              i++;
+              this.addEmptyTiles(1, GAME_FIELD_Y, randomX, 0);
+            }
+          }
+          i = 0;
+          while (i < hallNumY) {
+            const randomY = getRandomNumFromRange(1, GAME_FIELD_Y - 2);
+            if (
+              !this.isTileEmpty({ x: 0, y: randomY - 1 }) &&
+              !this.isTileEmpty({ x: 0, y: randomY + 1 })
+            ) {
+              i++;
+              this.addEmptyTiles(GAME_FIELD_X, 1, 0, randomY);
+            }
+          }
+        }
+
+        createRooms() {
+          const roomsNum = getRandomNumFromRange(
+            MIN_ROOM_NUMBER,
+            MAX_ROOM_NUMBER
+          );
+          let i = 0;
+          while (i < roomsNum) {
+            const roomWidth = getRandomNumFromRange(MIN_ROOM_LEN, MAX_ROOM_LEN);
+            const roomHeight = getRandomNumFromRange(
+              MIN_ROOM_LEN,
+              MAX_ROOM_LEN
+            );
+            const roomX = getRandomNumFromRange(
+              0,
+              GAME_FIELD_X - roomHeight - 2
+            );
+            const roomY = getRandomNumFromRange(
+              0,
+              GAME_FIELD_Y - roomWidth - 2
+            );
+            const isRoomReachable = this.isRoomReachable(
+              roomWidth,
+              roomHeight,
+              roomX,
+              roomY
+            );
+            if (isRoomReachable) {
+              this.addEmptyTiles(roomWidth, roomHeight, roomX, roomY);
+              i++;
+            }
+          }
+        }
+
+        placePlayers() {
+          let randomTile = {};
+          randomTile = this.getEmptyRandomTile();
+          this.hero.posX = randomTile.x;
+          this.hero.posY = randomTile.y;
+          this.map[this.hero.posX][this.hero.posY] = "tileP";
+          this.enemies.forEach((enemy) => {
+            randomTile = this.getEmptyRandomTile();
+            enemy.posX = randomTile.x;
+            enemy.posY = randomTile.y;
+            this.map[enemy.posX][enemy.posY] = "tileE";
+          });
+          this.healthBoxes.forEach((health) => {
+            randomTile = this.getEmptyRandomTile();
+            health.posX = randomTile.x;
+            health.posY = randomTile.y;
+            this.map[health.posX][health.posY] = "tileHP";
+          });
+          this.swordBoxes.forEach((health) => {
+            randomTile = this.getEmptyRandomTile();
+            health.posX = randomTile.x;
+            health.posY = randomTile.y;
+            this.map[health.posX][health.posY] = "tileSW";
+          });
+          this.portals.forEach((portal, i) => {
+            randomTile = this.getEmptyRandomTile();
+            portal.posX = randomTile.x;
+            portal.posY = randomTile.y;
+            if (i === 0) {
+              this.portals[this.portals.length - 1].linkedCoord = {
+                posX: randomTile.x,
+                posY: randomTile.y,
+              };
+            } else {
+              this.portals[i - 1].linkedCoord = {
+                posX: randomTile.x,
+                posY: randomTile.y,
+              };
+            }
+            this.map[portal.posX][portal.posY] = "tilePortal";
+          });
+        }
+
+        // FILED INIT END
+
+        // CHECKERS START
+        isRoomReachable(roomWidth, roomHeight, roomX, roomY) {
+          let isAllBlockChecked = false;
+          let checkX = roomX;
+          let checkY = roomY;
+          while (!isAllBlockChecked) {
+            if (this.map[checkX][checkY] === "tile") {
+              return true;
+            } else {
+              if (checkX < roomX + roomWidth) {
+                checkX++;
+              } else {
+                if (checkY < roomY + roomHeight) {
+                  checkY++;
+                } else {
+                  isAllBlockChecked = true;
+                }
+              }
+            }
+          }
+          return false;
+        }
+
+        isTileReachable(x, y) {
+          return (
+            this.tilesCoords.findIndex(
+              (tile) => tile.x === x && tile.y === y
+            ) !== -1
+          );
+        }
+
+        isTileEmpty({ x, y }) {
+          return this.map[x][y] === "tile";
+        }
+
+        // CHECKERS END
+
+        // GAMEPLAY FIELD FUNC START
+        updateGameField() {
+          $(".field").empty();
+          this.fillGameField();
+        }
+
+        fillGameField() {
+          this.map.forEach((row, x) => {
+            row.forEach((tile, y) => {
+              let tileRes = "";
+              switch (tile) {
+                case "tileW":
+                  tileRes = '<div class="tile tileW"></div>';
+                  break;
+                case "tile":
+                  tileRes = '<div class="tile"></div>';
+                  break;
+                case "tileP":
+                  tileRes = `<div class="tile tileP"><div class="health" style="width: ${
+                    (100 / FUll_HERO_HEALTH) * this.hero.health
+                  }%"></div></div></div>`;
+                  break;
+                case "tileE":
+                  const enemyHealth = this.getEnemyHealth(x, y);
+                  tileRes = `<div class="tile tileE"><div class="health" style="width: ${
+                    (100 / FUll_HERO_HEALTH) * enemyHealth
+                  }%"></div></div></div>`;
+                  break;
+                case "tileHP":
+                  tileRes = '<div class="tile tileHP"></div>';
+                  break;
+                case "tileSW":
+                  tileRes = '<div class="tile tileSW"></div>';
+                  break;
+                case "tileFB":
+                  tileRes = '<div class="tile tileFB"></div>';
+                  break;
+                case "tilePortal":
+                  tileRes = '<div class="tile tilePortal"></div>';
+                  break;
+                default:
+                  console.warn("unexpected tile type", tile);
+              }
+              $(".field").append(tileRes);
+            });
+          });
+        }
+
+        addEmptyTiles(width, height, x, y) {
+          for (let i = x; i < width + x; i++) {
+            for (let j = y; j < height + y; j++) {
+              this.map[i][j] = "tile";
+            }
+          }
+        }
+
+        getEmptyRandomTile() {
+          let randomIndex = 0;
+          do {
+            randomIndex = getRandomNumFromRange(0, this.tilesLen - 1);
+          } while (!this.isTileEmpty(this.tilesCoords[randomIndex]));
+          return this.tilesCoords[randomIndex];
+        }
+
+        setEmptyTilesCoords() {
+          let coords = [];
+          this.map.forEach((row, indexRow) =>
+            row.forEach(
+              (item, indexItem) =>
+                item === "tile" &&
+                coords.push({
+                  x: indexRow,
+                  y: indexItem,
+                })
+            )
+          );
+          this.tilesCoords = coords;
+          this.tilesLen = coords.length;
+        }
+
+        clearTile = ({ x, y }) => {
+          this.map[x][y] = "tile";
+        };
+        //GAMEPLAY FIELD FUNC END
+
+        //PLAYERS FUNC START
+        getEnemyHealth(x, y) {
+          const enemy = this.enemies.find((e) => e.posX === x && e.posY === y);
+          return enemy ? enemy.health : 0;
+        }
+
+        replaceHero({ x, y }) {
+          this.clearTile({ x: this.hero.posX, y: this.hero.posY });
+          this.map[x][y] = "tileP";
+          this.hero = { ...this.hero, posX: x, posY: y };
+          this.updateGameField();
+        }
+
+        replaceEnemyOnMap(currentCoords, newCoords) {
+          this.clearTile({ x: currentCoords.x, y: currentCoords.y });
+          this.map[newCoords.x][newCoords.y] = "tileE";
+        }
+
+        updateHeroHealth({ x, y }) {
+          this.hero.health = FUll_HERO_HEALTH;
+          this.healthBoxes = this.healthBoxes.filter(
+            (box) => box.posX !== x && box.posY !== y
+          );
+        }
+
+        updateHeroSword = ({ x, y }) => {
+          this.hero.fightPower++;
+          this.swordBoxes = this.swordBoxes.filter(
+            (box) => box.posX !== x && box.posY !== y
+          );
+        };
+
+        getNearEnemies = (coordsList) => {
+          const enemiesCoords = [];
+          coordsList.forEach((coord) => {
+            if (this.map[coord.x][coord.y] === "tileE")
+              enemiesCoords.push(coord);
+          });
+          return enemiesCoords;
+        };
+
+        getPortal({ x, y }) {
+          return this.portals.find((p) => p.posX === x && p.posY === y);
+        }
+
+        getCoordsFromPortal({ x, y }) {
+          const portal = this.getPortal({ x, y });
+          let newCoords = portal.linkedCoord;
+          let surroundCoords = getSurroundCoords(
+            newCoords.posX,
+            newCoords.posY
+          );
+          console.log(surroundCoords);
+          surroundCoords = surroundCoords.filter((coord) =>
+            this.isTileReachable(coord.x, coord.y)
+          );
+          return surroundCoords[0];
+        }
+
+        attackEnemies(coordsList) {
+          let enemyCounter = 0;
+          coordsList.forEach((coord) => {
+            const enemyIndex = this.enemies.findIndex(
+              (enemy) => enemy.posX === coord.x && enemy.posY === coord.y
+            );
+            if (enemyIndex > -1) {
+              enemyCounter++;
+              this.enemies[enemyIndex].health -= this.hero.fightPower;
+              if (this.enemies[enemyIndex].health < 1) {
+                this.enemies.splice(enemyIndex, 1);
+                this.clearTile(coord);
+                if (!this.enemies.length) this.finishGame(true);
+              }
+            }
+          });
+          enemyCounter && this.updateGameField();
+        }
+
+        destroyEnemy({ x, y }) {
+          console.log(x, y);
+          const enemyIndex = this.enemies.findIndex(
+            (enemy) => enemy.posX === x && enemy.posY === y
+          );
+          if (enemyIndex > -1) {
+            this.enemies.splice(enemyIndex, 1);
+            this.clearTile({ x, y });
+            this.updateGameField();
+          }
+        }
+
+        attackHero(enemyFightPower) {
+          this.hero.health -= enemyFightPower;
+          if (this.hero.health < 1) this.finishGame(false);
+        }
+
+        enemyMakeStep() {
+          const unreachableTilesTypes = [
+            "tileW",
+            "tileHP",
+            "tileSW",
+            "tileE",
+            "tilePortal",
+          ];
+          this.enemies.forEach((enemy) => {
+            const surroundCoords = getSurroundCoords(
+              enemy.posX,
+              enemy.posY
+            ).filter(
+              (coord) =>
+                coord.x >= 0 &&
+                coord.x < GAME_FIELD_X &&
+                coord.y >= 0 &&
+                coord.y < GAME_FIELD_Y
+            );
+            const surroundCoordsWithTilesTypes = [];
+            surroundCoords.forEach((coord) => {
+              if (!unreachableTilesTypes.includes(this.map[coord.x][coord.y])) {
+                surroundCoordsWithTilesTypes.push({
+                  ...coord,
+                  tileType: this.map[coord.x][coord.y],
+                });
+              }
+            });
+            if (surroundCoordsWithTilesTypes.length) {
+              // sometimes enemy might be blocked
+              if (
+                surroundCoordsWithTilesTypes.some(
+                  (tile) => tile.tileType === "tileP"
+                )
+              ) {
+                this.attackHero(enemy.fightPower);
+              } else {
+                const randomIndex = getRandomNumFromRange(
+                  0,
+                  surroundCoordsWithTilesTypes.length - 1
+                );
+                this.replaceEnemyOnMap(
+                  { x: enemy.posX, y: enemy.posY },
+                  {
+                    x: surroundCoordsWithTilesTypes[randomIndex].x,
+                    y: surroundCoordsWithTilesTypes[randomIndex].y,
+                  }
+                );
+                enemy.posX = surroundCoordsWithTilesTypes[randomIndex].x;
+                enemy.posY = surroundCoordsWithTilesTypes[randomIndex].y;
+              }
+            }
+          });
+          this.updateGameField();
+        }
+
+        //PLAYERS FUNC END
+
+        //GAMEPLAY START
+        startEnemiesMoves() {
+          let enemyStepIntervalId = setInterval(() => {
+            this.isPlaying
+              ? this.enemyMakeStep()
+              : clearInterval(enemyStepIntervalId);
+          }, ENEMY_TIME_STEP);
+        }
+
+        onWASDBtnsPress(keyCode) {
+          let heroNewCoords = {};
+          switch (keyCode) {
+            case "KeyW":
+              heroNewCoords = {
+                x: this.hero.posX - 1,
+                y: this.hero.posY,
+              };
+              break;
+            case "KeyA":
+              heroNewCoords = {
+                x: this.hero.posX,
+                y: this.hero.posY - 1,
+              };
+              break;
+            case "KeyS":
+              heroNewCoords = {
+                x: this.hero.posX + 1,
+                y: this.hero.posY,
+              };
+              break;
+            case "KeyD":
+              heroNewCoords = {
+                x: this.hero.posX,
+                y: this.hero.posY + 1,
+              };
+              break;
+            default:
+              console.log("other key pressed");
+          }
+          if (this.isTileReachable(heroNewCoords.x, heroNewCoords.y)) {
+            const tileType = this.map[heroNewCoords.x][heroNewCoords.y];
+            switch (tileType) {
+              case "tile":
+                this.replaceHero(heroNewCoords);
+                break;
+              case "tileHP":
+                this.updateHeroHealth(heroNewCoords);
+                this.replaceHero(heroNewCoords);
+                break;
+              case "tileSW":
+                this.updateHeroSword(heroNewCoords);
+                this.replaceHero(heroNewCoords);
+                break;
+              case "tilePortal":
+                const newCoords = this.getCoordsFromPortal(heroNewCoords);
+                console.log(newCoords);
+                heroNewCoords = {
+                  x: newCoords.x,
+                  y: newCoords.y,
+                };
+                this.replaceHero(heroNewCoords);
+                break;
+            }
+          }
+        }
+
+        onSpaceKeyPress() {
+          const heroSurround = getSurroundCoords(
+            this.hero.posX,
+            this.hero.posY
+          );
+          const nearEnemies = this.getNearEnemies(heroSurround);
+          if (nearEnemies.length) this.attackEnemies(nearEnemies);
+        }
+
+        moveFireball() {
+          if (
+            !(
+              this.fireball.x === this.hero.posX &&
+              this.fireball.y === this.hero.posY
+            )
+          ) {
+            this.clearTile({ x: this.fireball.x, y: this.fireball.y });
+          }
+          switch (this.lastDirection) {
+            case "KeyW":
+              this.fireball.x = this.fireball.x - 1;
+              break;
+            case "KeyA":
+              this.fireball.y = this.fireball.y - 1;
+              break;
+            case "KeyS":
+              this.fireball.x = this.fireball.x + 1;
+              break;
+            case "KeyD":
+              this.fireball.y = this.fireball.y + 1;
+              break;
+          }
+          const isNextTileReachable = this.isTileReachable(
+            this.fireball.x,
+            this.fireball.y
+          );
+          if (isNextTileReachable) {
+            const nextTileType = this.map[this.fireball.x][this.fireball.y];
+            switch (nextTileType) {
+              case "tile":
+              case "tileHP":
+              case "tileSW":
+                this.map[this.fireball.x][this.fireball.y] = "tileFB";
+                break;
+              case "tileE":
+                this.isFireballDestroyed = true;
+                this.destroyEnemy({ x: this.fireball.x, y: this.fireball.y });
+                break;
+              case "tileW":
+                this.isFireballDestroyed = true;
+                break;
+            }
+          } else {
+            this.isFireballDestroyed = true;
+          }
+          if (!this.isFireballDestroyed) {
+            this.map[this.fireball.x][this.fireball.y] = "tileFB";
+          }
+          this.updateGameField();
+        }
+
+        onFKeyPress() {
+          console.log("on f pressed");
+          if (this.isFireballDestroyed) {
+            this.isFireballDestroyed = false;
+            this.fireball = {
+              x: this.hero.posX,
+              y: this.hero.posY,
+            };
+            let fireBallIntervalId = setInterval(() => {
+              if (!this.isFireballDestroyed) {
+                this.moveFireball();
+              } else {
+                this.fireball = {};
+                clearInterval(fireBallIntervalId);
+              }
+            }, 500);
+          }
+        }
+
+        //GAMEPLAY END
+
+        createMap() {
+          this.createWallMap();
+          this.createHalls();
+          this.createRooms();
+          this.setEmptyTilesCoords();
+          this.playersInit();
+          this.placePlayers();
+          this.fillGameField();
+        }
+
+        startGame() {
+          this.isPlaying = true;
+          let gameTimerIntervalId = setInterval(() => {
+            this.isPlaying
+              ? this.gameTimer++
+              : clearInterval(gameTimerIntervalId);
+          }, 1000);
+          this.startEnemiesMoves();
+          $(document).on("keypress", (event) => {
+            // const isNotTimeForMove = this.gameTimer % (ENEMY_TIME_STEP / 1000);
+            const isNotTimeForMove = false;
+            if (this.isPlaying) {
+              switch (event.code) {
+                case "KeyW":
+                case "KeyA":
+                case "KeyS":
+                case "KeyD":
+                  if (
+                    !isNotTimeForMove &&
+                    this.lastMoveTimer != this.gameTimer
+                  ) {
+                    this.lastMoveTimer = this.gameTimer;
+                    if (this.isFireballDestroyed) {
+                      this.lastDirection = event.code;
+                    }
+                    this.onWASDBtnsPress(event.code);
+                  }
+                  break;
+                case "Space":
+                  this.onSpaceKeyPress();
+                  break;
+                case "KeyF":
+                  this.onFKeyPress();
+                  break;
+              }
+            }
+          });
+          $("#start-btn").addClass("hidden");
+          $("#restart-btn").addClass("hidden");
+          $("#pause-btn").removeClass("hidden");
+        }
+
+        pauseGame() {
+          this.isPlaying = !this.isPlaying;
+          $("#pause-btn")
+            .empty()
+            .append(`${this.isPlaying ? "Pause" : "Resume"}`);
+          $("#pause-btn").trigger("blur");
+          if (this.isPlaying) {
+            this.startEnemiesMoves();
+            $(".gameMsg").remove();
+          } else {
+            $(".field-box").prepend(
+              '<div class="gameMsg"><p class="info">Paused</p></div>'
+            );
+          }
+        }
+
+        restartGame() {
+          this.isPlaying = true;
+          this.map = [];
+          this.setEmptyTilesCoords();
+          this.updateGameField();
+          this.createMap();
+          this.startGame();
+          $("#restart-btn").trigger("blur");
+          $(".gameMsg").remove();
+        }
+
+        finishGame(isWinner) {
+          this.isPlaying = false;
+          $(document).off("keypress");
+          $("#pause-btn").addClass("hidden");
+          $("#restart-btn").removeClass("hidden");
+          isWinner
+            ? $(".field-box").prepend(
+                '<div class="gameMsg"><p class="winner">You win!</p></div>'
+              )
+            : $(".field-box").prepend(
+                '<div class="gameMsg"><p class="looser">You loose</p></div>'
+              );
+        }
+      }
+
+      const game = new Game();
+
+      $("#start-btn").on("click", (event) => {
+        game.createMap();
+        game.startGame();
+      });
+
+      $("#restart-btn").on("click", (event) => {
+        game.restartGame();
+      });
+
+      $("#pause-btn").on("click", (event) => {
+        game.pauseGame();
+      });
+    </script>
+  </body>
+</html>

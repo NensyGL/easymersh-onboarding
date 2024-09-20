@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+		<title>Document</title>
+	</head>
+	<body>
+		<div>
+			<input type="date" placeholder="date_start" name="date_start" required />
+			<input type="date" placeholder="date_end" name="date_end" required />
+			<input type="text" placeholder="user_name" name="user_name" required />
+			<input id="btn" type="button" value="Добавить" />
+			<div class="user_periods"></div>
+		</div>
+
+		<script>
+			const users = {
+				a: [{ dateStart: "2024-09-01", dateEnd: "2024-09-10" }],
+				b: [{ dateStart: "2024-08-01", dateEnd: "2024-08-15" }],
+			};
+
+			const displayDateRange = function (userName, dateStart, dateEnd) {
+				$(".user_periods").append(
+					`<div>user_name: ${userName}; dateStart: ${dateStart}; dateEnd: ${dateEnd}</div>`
+				);
+			};
+
+			const emptyFields = function () {
+				$("input[name=date_start]").val("");
+				$("input[name=date_end]").val("");
+				$("input[name=user_name]").val("");
+			};
+
+			$("#btn").on("click", event => {
+				console.log("btn clicked");
+				let dateStart = $("input[name=date_start]").val();
+				let dateEnd = $("input[name=date_end]").val();
+				const userName = $("input[name=user_name]").val();
+				if (dateStart && dateEnd && userName) {
+					if (dateEnd < dateStart) {
+						console.log("dateStart more than dateEnd, dates replaces");
+						const replacer = dateStart;
+						dateStart = dateEnd;
+						dateEnd = replacer;
+					}
+					const user = users[userName];
+					if (user) {
+						console.log("user exist", user);
+						let isOverlap = false;
+						for (let i = 0; i < user.length; i++) {
+							if (dateStart >= user[i].dateStart && dateStart <= user[i].dateEnd) {
+								isOverlap = true;
+								break;
+							}
+							if (dateEnd >= user[i].dateStart && dateEnd <= user[i].dateEnd) {
+								isOverlap = true;
+								break;
+							}
+							if (user[i].dateStart >= dateStart && user[i].dateStart <= dateEnd) {
+								isOverlap = true;
+								break;
+							}
+							if (user[i].dateEnd >= dateStart && user[i].dateEnd <= dateEnd) {
+								isOverlap = true;
+								break;
+							}
+						}
+						if (isOverlap) {
+							console.log("Dates overlap");
+						} else {
+							user.push({ dateStart, dateEnd });
+							displayDateRange(userName, dateStart, dateEnd);
+							emptyFields();
+						}
+					} else {
+						users[userName] = [];
+						users[userName].push({ dateStart, dateEnd });
+						displayDateRange(userName, dateStart, dateEnd);
+						emptyFields();
+					}
+				} else {
+					console.log("You have empty fields!");
+				}
+			});
+		</script>
+	</body>
+</html>

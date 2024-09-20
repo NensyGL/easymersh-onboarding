@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,700&amp;subset=cyrillic" rel="stylesheet" />
+		<link
+			href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&amp;subset=cyrillic"
+			rel="stylesheet"
+		/>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&amp;subset=cyrillic" rel="stylesheet" />
+		<link
+			href="https://fonts.googleapis.com/css?family=Playfair+Display:400,400i|Tinos:400,400i&amp;subset=cyrillic"
+			rel="stylesheet"
+		/>
+		<!--    <script type="text/javascript" src="/shared/3rdparty/jquery/jquery.js" language="javascript1.1"></script>-->
+		<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+		<!--    <script src="index.js"></script>-->
+		<!-- <script src="./utils.js"></script> -->
+		<!-- <script src="./game-board.js"></script> -->
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			body,
+			html {
+				height: 100%;
+			}
+
+			body {
+				background-color: #000000;
+				color: #ffffff;
+			}
+
+			h1 {
+				font-family: "Playfair Display";
+				font-size: 30px;
+				padding: 10px 0px;
+				margin: 0px;
+			}
+
+			.field-box {
+				border: 2px solid #d0d0d0;
+				float: left;
+				position: relative;
+			}
+
+			.field {
+				position: relative;
+				width: 1080px;
+				height: 576px;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+			}
+
+			.gameMsg {
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				z-index: 15;
+				background-color: rgb(0 0 0 / 40%);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.gameMsg p {
+				font-size: 100px;
+				font-family: "Playfair Display", "serif";
+				font-weight: bold;
+			}
+
+			.gameMsg .winner {
+				color: #5bcb3e;
+			}
+
+			.gameMsg .looser {
+				color: #f5292c;
+			}
+
+			.gameMsg .info {
+				color: #e7623e;
+			}
+
+			.field .tile {
+				width: 24px;
+				height: 24px;
+				background-size: 100%;
+				background-image: url(images/tile-.png);
+				z-index: 5;
+
+				font-size: 12px;
+				line-height: 24px;
+				text-align: center;
+			}
+
+			.split-tile {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: nowrap;
+			}
+
+			.split-tile div {
+				background-repeat: no-repeat;
+			}
+
+			.field .tileW {
+				background-image: url(images/tile-W.png);
+			}
+
+			.field .tileE {
+				background-image: url(images/tile-E.png);
+				z-index: 10;
+				position: relative;
+			}
+
+			.field .tileP {
+				background-image: url(images/tile-P.png);
+				z-index: 10;
+				position: relative;
+			}
+
+			.field .tileHP {
+				background-image: url(images/tile-HP.png);
+				z-index: 9;
+			}
+
+			.field .tileSW {
+				background-image: url(images/tile-SW.png);
+				z-index: 9;
+			}
+
+			.field .tileFB {
+				background-image: url(images/fireball.png);
+				z-index: 9;
+			}
+
+			.field .tilePortal {
+				background-image: url(images/portal.png);
+				z-index: 9;
+			}
+
+			.field .tile .health {
+				background-color: #ff0000;
+				z-index: 11;
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				height: 3px;
+			}
+
+			.field .tileP .health {
+				background-color: #00ff00;
+				z-index: 11;
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				height: 3px;
+			}
+
+			.inventory-box {
+				border: 2px solid #d0d0d0;
+				float: left;
+			}
+
+			.inventory {
+				position: relative;
+				width: 800px;
+				height: 32px;
+			}
+
+			.cl {
+				clear: both;
+				display: block;
+			}
+
+			/* #game-result {
+			} */
+
+			.hidden {
+				display: none;
+			}
+
+			#btn-container button {
+				margin: 10px auto;
+				width: 200px;
+				letter-spacing: 2px;
+				border-radius: 8px;
+				font-family: "Playfair Display", cursive;
+				color: #ffc000;
+				font-size: 18px;
+				font-weight: 400;
+				text-shadow: 0 1px 3px #000;
+				text-align: center;
+				padding: 10px 0;
+				background: radial-gradient(circle, #8b0000, #8b0000);
+				border: 4px ridge #ffb000;
+				box-shadow: inset 0px 0px 5px 3px rgba(1, 1, 1, 0.3);
+			}
+
+			#btn-container button:hover {
+				background: radial-gradient(circle, #e52b2b, #8b0000);
+				box-shadow: 0 0 5px 5px rgba(255, 255, 255, 0.2);
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Игровое поле</h1>
+		<!-- <div class="field-box">
+			<div class="field"></div>
+		</div> -->
+		<div class="cl"></div>
+		<!-- <div id="btn-container">
+			<button id="start-btn" class="">Start</button>
+			<button id="restart-btn" class="hidden">Restart</button>
+			<button id="pause-btn" class="hidden">Pause</button>
+		</div> -->
+		<!--<h1>Инвентарь</h1>
+<div class="inventory-box"><div class="inventory"></div></div>-->
+
+		<script>
+			const getRandomNumFromRange = (min, max) => {
+				return Math.floor(Math.random() * (max - min) + min);
+			};
+
+			const GameField = function (options) {
+				const default_options = {
+					isAllGamesPlayable: true,
+				};
+
+				this.options = options || {};
+
+				for (let key in default_options) {
+					if (!this.options[key]) {
+						this.options[key] = default_options[key];
+					}
+				}
+
+				// this.isPlaying = this.options.isPlaying;
+				this.isAllGamesPlayable = this.options.isAllGamesPlayable;
+
+				this.game1 = new Game({
+					gameplayBtns: {
+						up: "KeyW",
+						left: "KeyA",
+						down: "KeyS",
+						rigth: "KeyD",
+						fight: "Space",
+					},
+				});
+
+				// this.game2 = new Game({
+				// 	gameplayBtns: {
+				// 		up: "Numpad8",
+				// 		left: "Numpad4",
+				// 		down: "Numpad2",
+				// 		rigth: "Numpad6",
+				// 		fight: "Numpad0",
+				// 	},
+				// });
+			};
+
+			var Game = function (options) {
+				var default_options = {
+					GAME_FIELD_Y: 24,
+					GAME_FIELD_X: 45,
+					MIN_ROOM_NUMBER: 5,
+					MAX_ROOM_NUMBER: 10,
+					MIN_ROOM_LEN: 3,
+					MAX_ROOM_LEN: 8,
+					MIN_HALL_NUMBER: 3,
+					MAX_HALL_NUMBER: 5,
+					MIN_HALL_LENGTH: 10,
+					SWORD_NUM: 2,
+					HEALTH_NUM: 10,
+					ENEMY_NUM: 10,
+					ENEMY_TIME_STEP: 500,
+					BREAK_COUNTER_NUM: 100,
+				};
+
+				this.options = options || {};
+				for (var k in default_options) if (!this.options[k]) this.options[k] = default_options[k];
+
+				this.width = this.options.GAME_FIELD_X;
+				this.heigth = this.options.GAME_FIELD_Y;
+				this.hallsNum = getRandomNumFromRange(this.options.MIN_HALL_NUMBER, this.options.MAX_HALL_NUMBER);
+				this.roomsNum = getRandomNumFromRange(this.options.MIN_ROOM_NUMBER, this.options.MAX_ROOM_NUMBER);
+				this.enemiesNum = this.options.ENEMY_NUM;
+				this.maxEnemyNumPerRoom = 1;
+				this.tilesArr = [];
+				this.gameplayBtns = this.options.gameplayBtns;
+				this.gameHasErrors = false;
+				this.isPlaying = false;
+				this.isHeroMadeStepInInterval = false;
+				this.tag = $(`<div class="field-box"><div class="field"></div></div>`);
+				$("h1").after(this.tag);
+
+				this.create_wall_map();
+				this.create_halls();
+				this.display_map();
+				this.create_rooms();
+				this.init_entities();
+			};
+
+			Game.prototype.create_wall_map = function () {
+				for (let y = 0; y < this.heigth; y++) {
+					this.tilesArr[y] = [];
+					for (let x = 0; x < this.width; x++) {
+						this.tilesArr[y][x] = new Tile({ type: "tileW", x, y });
+					}
+				}
+			};
+
+			Game.prototype.get_tile = function (x, y) {
+				if (x >= 0 && x < this.width && y >= 0 && y < this.heigth) {
+					return this.tilesArr[y][x];
+				}
+			};
+
+			Game.prototype.update_tile_type = function (type, subtype, x, y) {
+				const tile = this.get_tile(x, y);
+				if (tile) {
+					tile.type = type;
+					subtype && tile.subtypes.push(subtype);
+				} else {
+					console.warn("Tile at x =", x, "y =", y, "not found");
+					this.gameHasErrors = true;
+				}
+			};
+
+			Game.prototype.get_random_hall_tile = function () {
+				const hallTilesArr = [];
+				this.tilesArr.forEach(row =>
+					row.forEach(col => {
+						if (col.subtypes.some(s => s.includes("hall"))) {
+							hallTilesArr.push(col);
+						}
+					})
+				);
+				const randomIndex = getRandomNumFromRange(0, hallTilesArr.length - 1);
+				return hallTilesArr[randomIndex];
+			};
+
+			// Game.prototype.is_hall_cross_itself = function (exceptionHallIndex, sectionArr) {
+			// 	sectionArr.forEach(section => {
+			// 		const tile = this.tilesArr[section.y][section.x];
+			// 		if (tile.subtypes.includes(exceptionHallIndex)) {
+			// 			return true;
+			// 		}
+			// 	});
+			// 	return false;
+			// };
+
+			Game.prototype.create_halls = function () {
+				const directions = ["up", "down", "left", "right"];
+				const oppositeDirections = {
+					up: "down",
+					down: "up",
+					left: "right",
+					right: "left",
+				};
+				console.log("this.hallsNum", this.hallsNum);
+				for (let hallIndex = 0; hallIndex < this.hallsNum; hallIndex++) {
+					let hallCoordsArr = [];
+					let isHallCreated = false;
+					let nextDirection = "";
+					let startPoint = {};
+					let directionsHistory = [];
+					let isOtherWallAchived = false;
+					let newCoor = {};
+
+					while (!isHallCreated) {
+						if (hallIndex === 0) {
+							const randomDirectionIndex = getRandomNumFromRange(0, directions.length - 1);
+							switch (randomDirectionIndex) {
+								case 0:
+									startPoint = {
+										y: 0,
+										x: getRandomNumFromRange(0, this.width - 1),
+									};
+									hallCoordsArr.push(startPoint);
+									nextDirection = "down";
+									break;
+								case 1:
+									startPoint = {
+										y: getRandomNumFromRange(0, this.heigth - 1),
+										x: this.width - 1,
+									};
+									hallCoordsArr.push(startPoint);
+									nextDirection = "left";
+									break;
+								case 2:
+									startPoint = {
+										y: this.heigth - 1,
+										x: getRandomNumFromRange(0, this.width - 1),
+									};
+									hallCoordsArr.push(startPoint);
+									nextDirection = "up";
+									break;
+								case 3:
+									startPoint = {
+										y: getRandomNumFromRange(0, this.heigth - 1),
+										x: 0,
+									};
+									hallCoordsArr.push(startPoint);
+									nextDirection = "right";
+									break;
+							}
+						} else {
+							const hallTile = this.get_random_hall_tile();
+							startPoint = { x: hallTile.x, y: hallTile.y };
+							hallCoordsArr.push({ x: hallTile.x, y: hallTile.y });
+							let firstAvaliableDirections = [];
+							if (startPoint.y - 1 >= 0) firstAvaliableDirections.push("up");
+							if (startPoint.y + 1 < this.heigth) firstAvaliableDirections.push("down");
+							if (startPoint.x - 1 >= 0) firstAvaliableDirections.push("left");
+							if (startPoint.x + 1 < this.width) firstAvaliableDirections.push("right");
+							const randomI = getRandomNumFromRange(0, firstAvaliableDirections.length - 1);
+							nextDirection = firstAvaliableDirections[randomI];
+						}
+
+						while (!isOtherWallAchived) {
+							if (directionsHistory.length >= 2) {
+								let avaliableDirections = [];
+								const lastDir1 = directionsHistory[directionsHistory.length - 1];
+								const lastDir2 = directionsHistory[directionsHistory.length - 2];
+								if (lastDir1 === lastDir2) {
+									avaliableDirections = directions.filter(
+										dir => dir !== oppositeDirections[lastDir1]
+									);
+								} else {
+									avaliableDirections.push(lastDir1);
+									avaliableDirections.push(lastDir2);
+								}
+								const randomI = getRandomNumFromRange(0, avaliableDirections.length - 1);
+								nextDirection = avaliableDirections[randomI];
+							}
+							switch (nextDirection) {
+								case "up":
+									newCoor = { y: startPoint.y - 1, x: startPoint.x };
+									if (!(newCoor.y >= 0 && newCoor.y < this.heigth)) isOtherWallAchived = true;
+									break;
+								case "down":
+									newCoor = { y: startPoint.y + 1, x: startPoint.x };
+									if (!(newCoor.y >= 0 && newCoor.y < this.heigth)) isOtherWallAchived = true;
+									break;
+								case "left":
+									newCoor = { x: startPoint.x - 1, y: startPoint.y };
+									if (!(newCoor.x >= 0 && newCoor.x < this.width)) isOtherWallAchived = true;
+									break;
+								case "right":
+									newCoor = { x: startPoint.x + 1, y: startPoint.y };
+									if (!(newCoor.x >= 0 && newCoor.x < this.width)) isOtherWallAchived = true;
+									break;
+							}
+							if (!isOtherWallAchived) {
+								const isNewCoorCrossHall = hallCoordsArr.some(
+									h => h.x === newCoor.x && h.y === newCoor.y
+								);
+								if (!isNewCoorCrossHall) {
+									directionsHistory.push(nextDirection);
+									hallCoordsArr.push({ x: newCoor.x, y: newCoor.y });
+									startPoint = { x: newCoor.x, y: newCoor.y };
+								} else {
+									if (hallIndex) {
+										const hallTile = this.get_random_hall_tile();
+										startPoint = { x: hallTile.x, y: hallTile.y };
+										hallCoordsArr = [{ x: hallTile.x, y: hallTile.y }];
+									} else {
+										startPoint = { x: hallCoordsArr[0].x, y: hallCoordsArr[0].y };
+										hallCoordsArr = [{ x: hallCoordsArr[0].x, y: hallCoordsArr[0].y }];
+									}
+								}
+							} else {
+								console.log("new hall" + hallIndex, "length", hallCoordsArr.length);
+								if (hallCoordsArr.length >= this.options.MIN_HALL_LENGTH) {
+									isHallCreated = true;
+									console.log("new hall arr", hallIndex, hallCoordsArr);
+									hallCoordsArr.forEach(hallTile => {
+										this.update_tile_type("tile", "hall" + hallIndex, hallTile.x, hallTile.y);
+									});
+								} else {
+									console.log("other wall achived, hall NOT");
+									startPoint = { x: hallCoordsArr[0].x, y: hallCoordsArr[0].y };
+									hallCoordsArr = [{ x: hallCoordsArr[0].x, y: hallCoordsArr[0].y }];
+									isOtherWallAchived = false;
+								}
+							}
+						}
+					}
+
+					// const sectionLen = getRandomNumFromRange(
+					// 	this.options.MIN_HALL_SECTION_LEN,
+					// 	this.options.MAX_HALL_SECTION_LEN
+					// );
+					// let sectionArr = [];
+					// if (!isFirstStep) {
+					// 	let avaliableDirections = directions.filter(dir => dir !== prohibitDirection);
+					// 	const randomI = getRandomNumFromRange(0, avaliableDirections.length - 1);
+					// 	nextDirection = avaliableDirections[randomI];
+					// } else {
+					// 	isFirstStep = false;
+					// 	sectionArr.push({ x: startPoint.x, y: startPoint.y });
+					// }
+					// for (let i = 1; i <= sectionLen; i++) {
+					// 	let newCoor = 0;
+					// 	switch (nextDirection) {
+					// 		case "up":
+					// 			newCoor = startPoint.y - i;
+					// 			if (newCoor >= 0 && newCoor < this.heigth) {
+					// 				prohibitDirection = "down";
+					// 				sectionArr.push({ x: startPoint.x, y: newCoor });
+					// 			} else isOtherWallAchived = true;
+					// 			break;
+					// 		case "down":
+					// 			newCoor = startPoint.y + i;
+					// 			if (newCoor >= 0 && newCoor < this.heigth) {
+					// 				prohibitDirection = "up";
+					// 				sectionArr.push({ x: startPoint.x, y: newCoor });
+					// 			} else isOtherWallAchived = true;
+					// 			break;
+					// 		case "left":
+					// 			newCoor = startPoint.x - i;
+					// 			if (newCoor >= 0 && newCoor < this.width) {
+					// 				prohibitDirection = "right";
+					// 				sectionArr.push({ x: newCoor, y: startPoint.y });
+					// 			} else isOtherWallAchived = true;
+					// 			break;
+					// 		case "right":
+					// 			newCoor = startPoint.x + i;
+					// 			if (newCoor >= 0 && newCoor < this.width) {
+					// 				prohibitDirection = "left";
+					// 				sectionArr.push({ x: newCoor, y: startPoint.y });
+					// 			} else isOtherWallAchived = true;
+					// 			break;
+					// 	}
+					// }
+					// const isSectionCrossItself = this.is_hall_cross_itself("hall" + hallIndex, sectionArr);
+					// if (!isSectionCrossItself) {
+					// 	sectionArr.forEach(section =>
+					// 		this.update_tile_type("tile", "hall" + hallIndex, section.x, section.y)
+					// 	);
+					// }
+					// startPoint = sectionArr[sectionArr.length - 1];
+					//}
+				}
+			};
+
+			Game.prototype.isRoomAbleToCreate = function (startPoint, roomWidth, roomHeight) {
+				let isCrossHall = false;
+				let isCrossOtherRoom = false;
+				for (let y = startPoint.y; y <= startPoint.y + roomHeight; y++) {
+					for (let x = startPoint.x; x <= startPoint.x + roomWidth; x++) {
+						const tile = this.get_tile(x, y);
+						if (tile.type === "tile") {
+							if (tile.subtypes.some(s => s.includes("hall"))) isCrossHall = true;
+							if (tile.subtypes.some(s => s.includes("room"))) {
+								isCrossOtherRoom = true;
+								break;
+							}
+						}
+					}
+					if (isCrossOtherRoom) break;
+				}
+				return isCrossHall && !isCrossOtherRoom;
+			};
+
+			Game.prototype.create_rooms = function () {
+				let breakCounter = 0;
+				let updatedRoomsNum = this.roomsNum;
+				let roomI = 0;
+
+				while (roomI < this.roomsNum) {
+					const roomWidth = getRandomNumFromRange(this.options.MIN_ROOM_LEN, this.options.MAX_ROOM_LEN);
+					const roomHeight = getRandomNumFromRange(this.options.MIN_ROOM_LEN, this.options.MAX_ROOM_LEN);
+					const startPoint = {
+						x: getRandomNumFromRange(0, this.width - 1 - roomWidth),
+						y: getRandomNumFromRange(0, this.heigth - 1 - roomHeight),
+					};
+					const isRoomAbleToCreate = this.isRoomAbleToCreate(startPoint, roomWidth, roomHeight);
+					if (isRoomAbleToCreate) {
+						for (let y = startPoint.y; y <= startPoint.y + roomHeight; y++) {
+							for (let x = startPoint.x; x <= startPoint.x + roomWidth; x++) {
+								this.update_tile_type("tile", "room" + roomI, x, y);
+							}
+						}
+						roomI++;
+						breakCounter = 0;
+					} else breakCounter++;
+
+					if (breakCounter > this.options.BREAK_COUNTER_NUM) {
+						console.warn("Impossible to create room with width =", roomWidth, "height =", roomHeight);
+						roomI++;
+						breakCounter = 0;
+						updatedRoomsNum--;
+					}
+				}
+
+				if (updatedRoomsNum) {
+					if (updatedRoomsNum !== this.roomsNum) {
+						this.roomsNum = updatedRoomsNum;
+					}
+					if (this.roomsNum < this.enemiesNum) {
+						this.maxEnemyNumPerRoom = Math.ceil(this.enemiesNum / this.roomsNum);
+					}
+				} else {
+					console.error("No rooms created");
+					this.gameHasErrors = true;
+				}
+			};
+
+			Game.prototype.display_map = function () {
+				for (let y = 0; y < this.heigth; y++) {
+					for (let x = 0; x < this.width; x++) {
+						const tile = this.get_tile(x, y);
+						tile.get_tile_html();
+						this.tag.find(".field").append(tile.html);
+					}
+				}
+			};
+
+			Game.prototype.update_map = function () {
+				this.tag.find(".field").empty();
+				this.display_map();
+			};
+
+			Game.prototype.get_entity_num_in_room = function (roomI, entityType) {
+				const roomArr = [];
+				this.tilesArr.forEach(row =>
+					row.forEach(col => {
+						if (col.subtypes.some(s => s.includes(roomI))) {
+							roomArr.push(col);
+						}
+					})
+				);
+				const entityArr = roomArr.filter(tile => tile.entityInTile && tile.entityInTile.type === entityType);
+				return entityArr.length;
+			};
+
+			Game.prototype.get_empty_tile_coords = function () {
+				let isTileFound = false;
+				let x = 0;
+				let y = 0;
+				while (!isTileFound) {
+					x = getRandomNumFromRange(0, this.width - 1);
+					y = getRandomNumFromRange(0, this.heigth - 1);
+					const tile = this.get_tile(x, y);
+					if (tile.type === "tile" && !tile.entityInTile && !tile.hero) {
+						isTileFound = true;
+					}
+				}
+				return { x, y };
+			};
+
+			Game.prototype.get_new_enemy_coords = function () {
+				let coordFound = false;
+				let x = 0;
+				let y = 0;
+				let breakCounter = 0;
+				while (!coordFound) {
+					x = getRandomNumFromRange(0, this.width - 1);
+					y = getRandomNumFromRange(0, this.heigth - 1);
+					const tile = this.get_tile(x, y);
+					if (tile.subtypes.some(s => s.includes("room")) && !tile.entityInTile && !tile.hero) {
+						const enemyCounter = this.get_entity_num_in_room(
+							tile.subtypes.find(s => s.includes("room")),
+							"enemy"
+						);
+						if (enemyCounter < this.maxEnemyNumPerRoom) {
+							coordFound = true;
+						} else {
+							breakCounter++;
+							if (breakCounter > this.options.BREAK_COUNTER_NUM) {
+								console.error("no place for enemy");
+							}
+						}
+					}
+				}
+				return { x, y };
+			};
+
+			Game.prototype.get_tile_surround_coords = function (x, y) {
+				let res = [
+					{
+						x: x - 1,
+						y: y,
+					},
+					{
+						x: x,
+						y: y + 1,
+					},
+					{
+						x: x + 1,
+						y: y,
+					},
+					{
+						x: x,
+						y: y - 1,
+					},
+				];
+				res = res.filter(item => item.x >= 0 && item.x < this.width && item.y >= 0 && item.y < this.heigth);
+				return res;
+			};
+
+			Game.prototype.init_entities = function () {
+				let coords = this.get_empty_tile_coords();
+				if (coords) {
+					let tile = this.get_tile(coords.x, coords.y);
+					tile.hero = new Entity({ type: "hero" });
+				} else {
+					console.error("No avaliable place for hero");
+					this.gameHasErrors = true;
+				}
+
+				let createdEntityCounter = 0;
+				for (let i = 0; i < this.enemiesNum; i++) {
+					coords = this.get_new_enemy_coords();
+					if (coords) {
+						createdEntityCounter++;
+						tile = this.get_tile(coords.x, coords.y);
+						tile.entityInTile = new Entity({ type: "enemy" });
+					}
+				}
+				if (!createdEntityCounter) {
+					console.error("No enemies on map");
+					this.gameHasErrors = true;
+				} else if (createdEntityCounter !== this.enemiesNum) {
+					this.enemiesNum = createdEntityCounter;
+				}
+
+				for (let i = 0; i < this.options.HEALTH_NUM; i++) {
+					coords = this.get_empty_tile_coords();
+					if (coords) {
+						tile = this.get_tile(coords.x, coords.y);
+						tile.entityInTile = new Entity({ type: "healthBox" });
+					}
+				}
+
+				for (let i = 0; i < this.options.SWORD_NUM; i++) {
+					coords = this.get_empty_tile_coords();
+					if (coords) {
+						tile = this.get_tile(coords.x, coords.y);
+						tile.entityInTile = new Entity({ type: "swordBox" });
+					}
+				}
+
+				if (this.gameHasErrors) {
+					console.error("Impossible to start the game");
+					this.isAllGamesPlayable = false;
+				} else {
+					this.update_map();
+					this.startGame();
+				}
+			};
+
+			Game.prototype.hero_made_step = function (btnCode) {
+				let heroTile = {};
+				this.tilesArr.forEach(row =>
+					row.forEach(col => {
+						if (col.hero) {
+							heroTile = col;
+						}
+					})
+				);
+				let newX = 0;
+				let newY = 0;
+				switch (btnCode) {
+					case this.gameplayBtns.up:
+						newX = heroTile.x;
+						newY = heroTile.y - 1;
+						break;
+					case this.gameplayBtns.left:
+						newX = heroTile.x - 1;
+						newY = heroTile.y;
+						break;
+					case this.gameplayBtns.down:
+						newX = heroTile.x;
+						newY = heroTile.y + 1;
+						break;
+					case this.gameplayBtns.rigth:
+						newX = heroTile.x + 1;
+						newY = heroTile.y;
+						break;
+				}
+				if (newX >= 0 && newX < this.width && newY >= 0 && newY < this.heigth) {
+					let tile = this.tilesArr[newY][newX];
+					if (tile.type === "tile" && tile.entityInTile) {
+						switch (tile.entityInTile.type) {
+							case "healthBox":
+								heroTile.hero.health = heroTile.hero.fullEntityHealth;
+								tile.hero = heroTile.hero;
+								heroTile.hero = null;
+								tile.entityInTile = null;
+								break;
+							case "swordBox":
+								heroTile.hero.fightPower++;
+								tile.hero = heroTile.hero;
+								heroTile.hero = null;
+								tile.entityInTile = null;
+								break;
+							case "enemy":
+								console.log("hero stepped on enemy");
+								tile.hero = heroTile.hero;
+								heroTile.hero = null;
+								break;
+						}
+						this.update_map();
+					} else if (tile.type === "tile" && !tile.entityInTile) {
+						tile.hero = heroTile.hero;
+						heroTile.hero = null;
+						this.update_map();
+					}
+				}
+			};
+
+			Game.prototype.hero_made_attack = function () {
+				let heroTile = {};
+				this.tilesArr.forEach(row =>
+					row.forEach(col => {
+						if (col.hero) {
+							heroTile = col;
+						}
+					})
+				);
+				const surroundCoords = this.get_tile_surround_coords(heroTile.x, heroTile.y);
+				let nearEnemiesTiles = [];
+				surroundCoords.forEach(coord => {
+					const tile = this.tilesArr[coord.y][coord.x];
+					if (tile.entityInTile && tile.entityInTile.type === "enemy") {
+						nearEnemiesTiles.push(tile);
+					}
+				});
+				if (nearEnemiesTiles.length) {
+					nearEnemiesTiles.forEach(tile => {
+						tile.entityInTile.health -= heroTile.hero.fightPower;
+						if (tile.entityInTile.health < 1) {
+							tile.entityInTile = null;
+							this.enemiesNum--;
+						}
+						this.update_map();
+					});
+					if (!this.enemiesNum) {
+						this.isPlaying = false;
+						this.isAllGamesPlayable = false;
+						console.log("All enemies are dead, hero wins");
+					}
+				}
+			};
+
+			Game.prototype.enemy_do_step = function () {
+				let enemiesTiles = [];
+				this.tilesArr.forEach(row =>
+					row.forEach(col => {
+						if (col.entityInTile && col.entityInTile.type === "enemy") {
+							enemiesTiles.push(col);
+						}
+					})
+				);
+				enemiesTiles.forEach(enemyTile => {
+					let isHeroAchivable = false;
+					const achivableTiles = [];
+					const surroundCoords = this.get_tile_surround_coords(enemyTile.x, enemyTile.y);
+					surroundCoords.forEach(coord => {
+						const tile = this.tilesArr[coord.y][coord.x];
+						if (tile.hero) {
+							isHeroAchivable = true;
+							tile.hero.health--;
+							if (tile.hero.health < 1) {
+								this.isPlaying = false;
+								this.isAllGamesPlayable = false;
+								console.log("hero is dead");
+							}
+						}
+						if (tile.type === "tile" && !tile.entityInTile) achivableTiles.push(tile);
+					});
+					if (achivableTiles.length && !isHeroAchivable) {
+						const randomIndex = getRandomNumFromRange(0, achivableTiles.length);
+						achivableTiles[randomIndex].entityInTile = enemyTile.entityInTile;
+						enemyTile.entityInTile = null;
+					}
+				});
+				this.update_map();
+			};
+
+			Game.prototype.startGame = function () {
+				console.log("start game called");
+				this.isPlaying = true;
+				$(document).on("keypress", event => {
+					if (this.isPlaying) {
+						switch (event.code) {
+							case this.gameplayBtns.up:
+							case this.gameplayBtns.down:
+							case this.gameplayBtns.left:
+							case this.gameplayBtns.rigth:
+								if (!this.isHeroMadeStepInInterval) {
+									this.isHeroMadeStepInInterval = true;
+									this.hero_made_step(event.code);
+								}
+								break;
+							case this.gameplayBtns.fight:
+								this.hero_made_attack();
+						}
+					}
+				});
+				let enemyStepInterval = setInterval(() => {
+					this.isPlaying ? this.enemy_do_step() : clearInterval(enemyStepInterval);
+					this.isHeroMadeStepInInterval = false;
+				}, this.options.ENEMY_TIME_STEP);
+			};
+
+			var Tile = function (options) {
+				const default_options = {
+					type: "tileW",
+					subtypes: [],
+					x: 0,
+					y: 0,
+					entityInTile: null,
+					hero: null,
+					html: "",
+				};
+
+				this.options = options;
+				for (let key in default_options) {
+					if (!this.options[key]) {
+						this.options[key] = default_options[key];
+					}
+				}
+
+				this.type = this.options.type;
+				this.subtypes = this.options.subtypes;
+				this.entityInTile = this.options.enemiesTiles;
+				this.hero = this.options.hero;
+				this.x = this.options.x;
+				this.y = this.options.y;
+				this.html = this.options.html;
+			};
+
+			Tile.prototype.get_tile_html = function () {
+				let tileRes = "";
+				switch (this.type) {
+					case "tileW":
+						tileRes = '<div class="tile tileW"></div>';
+						break;
+					case "tile":
+						const roomNums = this.subtypes
+							.map(function (el) {
+								return el.match(/room(\d+)/) && el.match(/room(\d+)/)[1];
+							})
+							.filter(function (el) {
+								return el;
+							})
+							.join(",");
+						const hallNums = this.subtypes
+							.map(function (el) {
+								return el.match(/hall(\d+)/) && el.match(/hall(\d+)/)[1];
+							})
+							.filter(function (el) {
+								return el;
+							})
+							.join(",");
+						if (this.entityInTile && !this.hero) {
+							switch (this.entityInTile.type) {
+								case "enemy":
+									tileRes = `<div class="tile tileE"><div class="health" style="width: ${
+										(100 / this.entityInTile.fullEntityHealth) * this.entityInTile.health
+									}%"></div></div></div>`;
+									break;
+								case "healthBox":
+									tileRes = '<div class="tile tileHP"></div>';
+									break;
+								case "swordBox":
+									tileRes = '<div class="tile tileSW"></div>';
+									break;
+							}
+						} else if (!this.entityInTile && this.hero) {
+							tileRes = `<div class="tile tileP"><div class="health" style="width: ${
+								(100 / this.hero.fullEntityHealth) * this.hero.health
+							}%"></div></div></div>`;
+						} else if (this.entityInTile && this.entityInTile.type === "enemy" && this.hero) {
+							tileRes = `<div class="tile split-tile"><div class="tile tileE"><div class="health" style="width: ${
+								(100 / this.entityInTile.fullEntityHealth) * this.entityInTile.health
+							}%"></div></div><div class="tile tileP"><div class="health" style="width: ${
+								(100 / this.hero.fullEntityHealth) * this.hero.health
+							}%"></div></div></div>`;
+						} else if (!this.entityInTile && !this.hero)
+							tileRes = `<div class="tile">${roomNums}/${hallNums}</div>`;
+						break;
+					default:
+						tileRes = `<div class="tile" style="background-color: red">${roomNums}</div>`;
+				}
+				if (!tileRes) console.log("empty tile html", this.type, this);
+				this.html = tileRes;
+			};
+
+			var Entity = function (options) {
+				const default_options = {
+					type: "",
+					fullEntityHealth: 5,
+					health: 5,
+					fightPower: 1,
+				};
+
+				this.options = options || {};
+				for (let key in default_options) {
+					if (!this.options[key]) {
+						this.options[key] = default_options[key];
+					}
+				}
+
+				this.type = this.options.type;
+				this.health = this.options.health;
+				this.fullEntityHealth = this.options.fullEntityHealth;
+				this.fightPower = this.options.fightPower;
+			};
+
+			const gameField = new GameField({});
+		</script>
+	</body>
+</html>
