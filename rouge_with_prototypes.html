@@ -711,7 +711,7 @@
 					let tile = this.get_tile(coords.x, coords.y);
 					tile.hero = new Entity({ type: "hero" });
 				} else {
-					console.error("No avaliable place for hero");
+					console.error("No available place for hero");
 					this.gameHasErrors = true;
 				}
 
@@ -931,7 +931,7 @@
 
 				this.type = this.options.type;
 				this.subtypes = this.options.subtypes;
-				this.entityInTile = this.options.enemiesTiles;
+				this.entityInTile = this.options.entityInTile;
 				this.hero = this.options.hero;
 				this.x = this.options.x;
 				this.y = this.options.y;
@@ -986,10 +986,12 @@
 								(100 / this.hero.fullEntityHealth) * this.hero.health
 							}%"></div></div></div>`;
 						} else if (!this.entityInTile && !this.hero)
-							tileRes = `<div class="tile">${roomNums}/${hallNums}</div>`;
+							// tileRes = `<div class="tile">${roomNums}/${hallNums}</div>`;
+							tileRes = `<div class="tile"></div>`;
 						break;
 					default:
-						tileRes = `<div class="tile" style="background-color: red">${roomNums}</div>`;
+						// tileRes = `<div class="tile" style="background-color: red">${roomNums}</div>`;
+						tileRes = `<div class="tile"></div>`;
 				}
 				if (!tileRes) console.log("empty tile html", this.type, this);
 				this.html = tileRes;

@@ -7,90 +7,124 @@
 	</head>
 	<body>
 		<script>
-			const hash = [
-				{ 53: { name: "Ga.Skinactive Face", parent_id: null } },
-				{ 79: { name: "Товары конкуренты", parent_id: null } },
-				{ 82: { name: "at", parent_id: null } },
-				{ 52: { name: "C-Pie", parent_id: null } },
-				{ 38: { name: "Товары", parent_id: null } },
-				{ 116: { name: "Сцены", parent_id: null } },
-				{ 95: { name: "Беко", parent_id: null } },
-				{ 39: { name: "Конкуренты", parent_id: null } },
-				{ 54: { name: "Ultra Doux Haircare", parent_id: null } },
-				{ 59: { name: "HEAD & SHOULDERS", parent_id: null } },
-				{ 51: { name: "Coca-Cola", parent_id: null } },
-				{ 134: { name: "категория котик", parent_id: null } },
-				{ 128: { name: "SPLAT", parent_id: null } },
-				{ 74: { name: "Тестовое майонезное", parent_id: null } },
-				{ 56: { name: "ORAL_B", parent_id: null } },
-				{ 58: { name: "L'Oreal Skin Expert", parent_id: null } },
-				{ 64: { name: "тестовая категория", parent_id: null } },
-				{ 57: { name: "Nivea", parent_id: null } },
-				{ 41: { name: "Чай", parent_id: 39 } },
-				{ 44: { name: "Уход за волосами", parent_id: 38 } },
-				{ 118: { name: "Теплая полка", parent_id: 116 } },
-				{ 127: { name: "POP материалы", parent_id: 116 } },
-				{ 75: { name: "Nivea", parent_id: 38 } },
-				{ 46: { name: "Макаронные изделия", parent_id: 38 } },
-				{ 103: { name: "FS OVEN", parent_id: 95 } },
-				{ 120: { name: "Зубная паста", parent_id: 116 } },
-				{ 123: { name: "Паразит", parent_id: 116 } },
-				{ 113: { name: "Coffee Machine", parent_id: 95 } },
-				{ 114: { name: "Range Cooker", parent_id: 95 } },
-				{ 104: { name: "Hood", parent_id: 95 } },
-				{ 105: { name: "Refrigerator", parent_id: 95 } },
-				{ 106: { name: "Washing Machine", parent_id: 95 } },
-				{ 108: { name: "Washer Dryer", parent_id: 95 } },
-				{ 109: { name: "BI Comp. oven", parent_id: 95 } },
-				{ 110: { name: "MWO", parent_id: 95 } },
-				{ 55: { name: "SPLAT", parent_id: 128 } },
-				{ 42: { name: "Напитки", parent_id: 38 } },
-				{ 81: { name: "Йогурт питьевой", parent_id: 79 } },
-				{ 94: { name: "Конкуренты", parent_id: 82 } },
-				{ 101: { name: "Freezer", parent_id: 95 } },
-				{ 125: { name: "Линия раздачи", parent_id: 116 } },
-				{ 107: { name: "Accessories", parent_id: 95 } },
-				{ 93: { name: "Товары", parent_id: 82 } },
-				{ 102: { name: "FS DW", parent_id: 95 } },
-				{ 98: { name: "BI oven", parent_id: 95 } },
-				{ 122: { name: "Стойка", parent_id: 116 } },
-				{ 100: { name: "Dryer", parent_id: 95 } },
-				{ 83: { name: "Бренды конкурентов", parent_id: 82 } },
-				{ 96: { name: "BI DW", parent_id: 95 } },
-				{ 99: { name: "BI WM", parent_id: 95 } },
-				{ 97: { name: "BI hob", parent_id: 95 } },
-				{ 40: { name: "Чай", parent_id: 38 } },
-				{ 121: { name: "Торец", parent_id: 116 } },
-				{ 129: { name: "Конкуренты", parent_id: 128 } },
-				{ 47: { name: "Специи", parent_id: 38 } },
-				{ 117: { name: "Холодная полка", parent_id: 116 } },
-				{ 43: { name: "Уход за полостью рта", parent_id: 38 } },
-				{ 126: { name: "Обвес", parent_id: 116 } },
-				{ 124: { name: "ДМП", parent_id: 116 } },
-				{ 112: { name: "BI Ref", parent_id: 95 } },
-				{ 111: { name: "BI MWO", parent_id: 95 } },
-				{ 70: { name: "Chernogolovka", parent_id: 38 } },
-				{ 45: { name: "Уход за лицом", parent_id: 38 } },
-				{ 80: { name: "Йогурт ложковой", parent_id: 79 } },
-				{ 119: { name: "Холодильное оборудование", parent_id: 116 } },
-				{ 63: { name: "test", parent_id: 38 } },
-				{ 50: { name: "BIOMIO", parent_id: 55 } },
-				{ 92: { name: "Ополаскиватель", parent_id: 93 } },
-				{ 86: { name: "Зубные протезы", parent_id: 93 } },
-				{ 132: { name: "Oral Care для взрослых (конкуренты)", parent_id: 129 } },
-				{ 130: { name: "Beauty care (конкуренты)", parent_id: 129 } },
-				{ 115: { name: "splat2", parent_id: 55 } },
-				{ 84: { name: "Зубные Нити", parent_id: 93 } },
-				{ 77: { name: "Deo", parent_id: 75 } },
-				{ 89: { name: "Зубные порошки конкурентов", parent_id: 94 } },
-				{ 90: { name: "Зубные щетки конкурентов", parent_id: 94 } },
-				{ 60: { name: "BIONYTI", parent_id: 55 } },
-				{ 49: { name: "BIOMED", parent_id: 55 } },
-				{ 88: { name: "Зубные пасты конкурентов", parent_id: 94 } },
-				{ 76: { name: "SkinCare", parent_id: 75 } },
-			];
+			const hash = {
+				 53: { name: "Ga.Skinactive Face", parent_id: null },
+				 79: { name: "Товары конкуренты", parent_id: null },
+				 82: { name: "at", parent_id: null },
+				 52: { name: "C-Pie", parent_id: null },
+				 38: { name: "Товары", parent_id: null },
+				 116: { name: "Сцены", parent_id: null },
+				 95: { name: "Беко", parent_id: null },
+				 39: { name: "Конкуренты", parent_id: null },
+				 54: { name: "Ultra Doux Haircare", parent_id: null },
+				 59: { name: "HEAD & SHOULDERS", parent_id: null },
+				 51: { name: "Coca-Cola", parent_id: null },
+				 134: { name: "категория котик", parent_id: null },
+				 128: { name: "SPLAT", parent_id: null },
+				 74: { name: "Тестовое майонезное", parent_id: null },
+				 56: { name: "ORAL_B", parent_id: null },
+				 58: { name: "L'Oreal Skin Expert", parent_id: null },
+				 64: { name: "тестовая категория", parent_id: null },
+				 57: { name: "Nivea", parent_id: null },
+				 41: { name: "Чай", parent_id: 39 },
+				 44: { name: "Уход за волосами", parent_id: 38 },
+				 118: { name: "Теплая полка", parent_id: 116 },
+				 127: { name: "POP материалы", parent_id: 116 },
+				 75: { name: "Nivea", parent_id: 38 },
+				 46: { name: "Макаронные изделия", parent_id: 38 },
+				 103: { name: "FS OVEN", parent_id: 95 },
+				 120: { name: "Зубная паста", parent_id: 116 },
+				 123: { name: "Паразит", parent_id: 116 },
+				 113: { name: "Coffee Machine", parent_id: 95 },
+				 114: { name: "Range Cooker", parent_id: 95 },
+				 104: { name: "Hood", parent_id: 95 },
+				 105: { name: "Refrigerator", parent_id: 95 },
+				 106: { name: "Washing Machine", parent_id: 95 },
+				 108: { name: "Washer Dryer", parent_id: 95 },
+				 109: { name: "BI Comp. oven", parent_id: 95 },
+				 110: { name: "MWO", parent_id: 95 },
+				 55: { name: "SPLAT", parent_id: 128 },
+				 42: { name: "Напитки", parent_id: 38 },
+				 81: { name: "Йогурт питьевой", parent_id: 79 },
+				 94: { name: "Конкуренты", parent_id: 82 },
+				 101: { name: "Freezer", parent_id: 95 },
+				 125: { name: "Линия раздачи", parent_id: 116 },
+				 107: { name: "Accessories", parent_id: 95 },
+				 93: { name: "Товары", parent_id: 82 },
+				 102: { name: "FS DW", parent_id: 95 },
+				 98: { name: "BI oven", parent_id: 95 },
+				 122: { name: "Стойка", parent_id: 116 },
+				 100: { name: "Dryer", parent_id: 95 },
+				 83: { name: "Бренды конкурентов", parent_id: 82 },
+				 96: { name: "BI DW", parent_id: 95 },
+				 99: { name: "BI WM", parent_id: 95 },
+				 97: { name: "BI hob", parent_id: 95 },
+				 40: { name: "Чай", parent_id: 38 },
+				 121: { name: "Торец", parent_id: 116 },
+				 129: { name: "Конкуренты", parent_id: 128 },
+				 47: { name: "Специи", parent_id: 38 },
+				 117: { name: "Холодная полка", parent_id: 116 },
+				 43: { name: "Уход за полостью рта", parent_id: 38 },
+				 126: { name: "Обвес", parent_id: 116 },
+				 124: { name: "ДМП", parent_id: 116 },
+				 112: { name: "BI Ref", parent_id: 95 },
+				 111: { name: "BI MWO", parent_id: 95 },
+				 70: { name: "Chernogolovka", parent_id: 38 },
+				 45: { name: "Уход за лицом", parent_id: 38 },
+				 80: { name: "Йогурт ложковой", parent_id: 79 },
+				 119: { name: "Холодильное оборудование", parent_id: 116 },
+				 63: { name: "test", parent_id: 38 },
+				 50: { name: "BIOMIO", parent_id: 55 },
+				 92: { name: "Ополаскиватель", parent_id: 93 },
+				 86: { name: "Зубные протезы", parent_id: 93 },
+				 132: { name: "Oral Care для взрослых (конкуренты)", parent_id: 129 },
+				 130: { name: "Beauty care (конкуренты)", parent_id: 129 },
+				 115: { name: "splat2", parent_id: 55 },
+				 84: { name: "Зубные Нити", parent_id: 93 },
+				 77: { name: "Deo", parent_id: 75 },
+				 89: { name: "Зубные порошки конкурентов", parent_id: 94 },
+				 90: { name: "Зубные щетки конкурентов", parent_id: 94 },
+				 60: { name: "BIONYTI", parent_id: 55 },
+				 49: { name: "BIOMED", parent_id: 55 },
+				 88: { name: "Зубные пасты конкурентов", parent_id: 94 },
+				 76: { name: "SkinCare", parent_id: 75 },
+			};
 
-			function get_hash_el_by_id(id) {
+            function get_parent_name(item) {
+                if (item.parent_id === null) return item.name;
+                return item.name + " / " + get_parent_name(hash[item.parent_id]);
+            }
+
+            function calc_path(hash) {
+                for (let key in hash) {
+                    const item = hash[key];
+                    let path = get_parent_name(item);
+                    console.log('calc_path for', key, item, path);
+					item.calc_path = path;
+                }
+            }
+
+			function set_name(hash, id, name) {
+				const item = hash[id];
+				item.name = name;
+				calc_path(hash);
+
+				/*let is_null_parent = false;
+				let new_item = item;
+				while (!is_null_parent) {
+					if (hash[new_item.parent_id]) {
+						is_null_parent = true;
+					} else {
+						new_item = hash[new_item.parent_id];
+						new_item.calc_path = get_parent_name(new_item);
+					}
+				}*/
+			}
+
+
+
+
+			/*function get_hash_el_by_id(id) {
                 let res;
                 // for (let i = 0; i < hash.length; i++) {
                 //     for (let key in hash[i]) {
@@ -109,9 +143,9 @@
 					}
 				});
                 return res;
-			}
+			}*/
 
-			function get_parent_name_by_id(id) {
+			/*function get_parent_name_by_id(id) {
                 console.log('get_parent_name_by_id id', id);
 				let res = get_hash_el_by_id(id);
                 console.log('get_parent_name_by_id hash', res);
@@ -129,9 +163,9 @@
 				// 	get_parent_name_by_id(hashEl.parent_id);
 				// }
                 // return res;
-			}
+			}*/
 
-			function calc_paths(hash) {
+			/*function calc_paths(hash) {
 				hash.forEach(hashEl => {
 					let name = "";
 					// console.log(hashEl);
@@ -140,14 +174,14 @@
                         if (hashEl[key].parent_id !== null) {
                             console.log('key parentId !== null', key);
                             console.log('hash', hashEl[key]);
-                            name = get_parent_name_by_id(hashEl[key].parent_id);  
-                            console.log('name', name);  
+                            name = get_parent_name_by_id(hashEl[key].parent_id);
+                            console.log('name', name);
                         }
 					}
 				});
 			}
 
-			calc_paths(hash);
+			calc_paths(hash);*/
 		</script>
 	</body>
 </html>
